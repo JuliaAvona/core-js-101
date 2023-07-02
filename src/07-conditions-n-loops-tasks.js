@@ -166,9 +166,7 @@ function doRectanglesOverlap(rect1, rect2) {
  *
  */
 function isInsideCircle(circle, point) {
-  return (
-    (point.x - circle.center.x) ** 2 + (point.y - circle.center.y) ** 2 < circle.radius ** 2
-  );
+  return ((point.x - circle.center.x) ** 2 + (point.y - circle.center.y) ** 2 < circle.radius ** 2);
 }
 
 /**
@@ -253,8 +251,8 @@ function reverseString(str) {
  *   87354 => 45378
  *   34143 => 34143
  */
-function reverseInteger(/* num */) {
-  throw new Error('Not implemented');
+function reverseInteger(num) {
+  return +num.toString().split('').reverse().join('');
 }
 
 /**
@@ -277,8 +275,25 @@ function reverseInteger(/* num */) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
+function isCreditCardNumber(ccn) {
+  const IDCARD = ccn.toString();
+  const len = ccn.toString().length;
+
+  let sum = 0;
+  let isSecond = false;
+  for (let i = len - 1; i >= 0; i -= 1) {
+    let check = IDCARD[i].charCodeAt() - '0'.charCodeAt();
+
+    if (isSecond === true) {
+      check *= 2;
+    }
+
+    sum += parseInt(check / 10, 10);
+    sum += check % 10;
+
+    isSecond = !isSecond;
+  }
+  return sum % 10 === 0;
 }
 
 /**
@@ -295,8 +310,16 @@ function isCreditCardNumber(/* ccn */) {
  *   10000 ( 1+0+0+0+0 = 1 ) => 1
  *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
  */
-function getDigitalRoot(/* num */) {
-  throw new Error('Not implemented');
+function getDigitalRoot(num) {
+  const result = String(num)
+    .split('')
+    .reduce((acc, elem) => acc + Number(elem), 0);
+
+  if (result <= 9) {
+    return result;
+  }
+
+  return getDigitalRoot(result);
 }
 
 /**
@@ -320,8 +343,26 @@ function getDigitalRoot(/* num */) {
  *   '{)' = false
  *   '{[(<{[]}>)]}' = true
  */
-function isBracketsBalanced(/* str */) {
-  throw new Error('Not implemented');
+function isBracketsBalanced(str) {
+  const close = [']', ')', '}', '>'];
+  const open = ['[', '(', '{', '<'];
+  const myStack = [];
+  let i = 0;
+  while (i < str.length) {
+    if (open.includes(str[i])) {
+      myStack.push(str[i]);
+    }
+
+    if (close.includes(str[i])) {
+      const index = close.indexOf(str[i]);
+
+      if (myStack.length === 0 || myStack.pop() !== open[index]) {
+        return false;
+      }
+    }
+    i += 1;
+  }
+  return myStack.length === 0;
 }
 
 /**
@@ -344,8 +385,8 @@ function isBracketsBalanced(/* str */) {
  *    365, 4  => '11231'
  *    365, 10 => '365'
  */
-function toNaryString(/* num, n */) {
-  throw new Error('Not implemented');
+function toNaryString(num, n) {
+  return num.toString(n);
 }
 
 /**
@@ -360,8 +401,21 @@ function toNaryString(/* num, n */) {
  *   ['/web/assets/style.css', '/.bin/mocha',  '/read.me'] => '/'
  *   ['/web/favicon.ico', '/web-scripts/dump', '/verbalizer/logs'] => '/'
  */
-function getCommonDirectoryPath(/* pathes */) {
-  throw new Error('Not implemented');
+function getCommonDirectoryPath(pathes) {
+  let path = '';
+  const i = 1;
+
+  while (i) {
+    const regExp = new RegExp(`^${path}[a-z0-9_]*/`, 'i');
+    const search = regExp.exec(pathes[0]);
+    const res = pathes.filter((elem) => elem.indexOf(search) === 0);
+    if (res.length === pathes.length) {
+      path = search;
+    } else {
+      break;
+    }
+  }
+  return path;
 }
 
 /**
@@ -382,8 +436,20 @@ function getCommonDirectoryPath(/* pathes */) {
  *                         [ 6 ]]
  *
  */
-function getMatrixProduct(/* m1, m2 */) {
-  throw new Error('Not implemented');
+function getMatrixProduct(m1, m2) {
+  const multiply = Array(m1.length)
+    .fill()
+    .map(() => Array(m2[0].length).fill(0));
+
+  for (let i = 0; i < m1.length; i += 1) {
+    for (let j = 0; j < m2[0].length; j += 1) {
+      for (let g = 0; g < m1[0].length; g += 1) {
+        multiply[i][j] += m1[i][g] * m2[g][j];
+      }
+    }
+  }
+
+  return multiply;
 }
 
 /**
@@ -416,8 +482,48 @@ function getMatrixProduct(/* m1, m2 */) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(position) {
+  const isMatch = (e1, e2, e3) => (e1 === e2 && e2 === e3 ? e1 : undefined);
+  let result;
+
+  // vert
+  result = isMatch(...position.map((el) => el[0]));
+  if (result) {
+    return result;
+  }
+  result = isMatch(...position.map((el) => el[1]));
+  if (result) {
+    return result;
+  }
+  result = isMatch(...position.map((el) => el[2]));
+  if (result) {
+    return result;
+  }
+
+  // acr
+  result = isMatch(...position[0]);
+  if (result) {
+    return result;
+  }
+  result = isMatch(...position[1]);
+  if (result) {
+    return result;
+  }
+  result = isMatch(...position[2]);
+  if (result) {
+    return result;
+  }
+
+  // diag
+  result = isMatch(...position.map((el, i) => el[i]));
+  if (result) {
+    return result;
+  }
+  result = isMatch(...position.map((el, i) => el[2 - i]));
+  if (result) {
+    return result;
+  }
+  return undefined;
 }
 
 module.exports = {
