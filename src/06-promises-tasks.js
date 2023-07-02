@@ -5,7 +5,6 @@
  *                                                                                                *
  ************************************************************************************************ */
 
-
 /**
  * Return Promise object that is resolved with string value === 'Hooray!!! She said "Yes"!',
  * if boolean value === true is passed, resolved with string value === 'Oh no, she said "No".',
@@ -28,10 +27,20 @@
  *      .catch((error) => console.log(error.message)) // 'Error: Wrong parameter is passed!
  *                                                    //  Ask her again.';
  */
-function willYouMarryMe(/* isPositiveAnswer */) {
-  throw new Error('Not implemented');
+async function willYouMarryMe(isPositiveAnswer) {
+  switch (isPositiveAnswer) {
+    case true: {
+      const p1 = await Promise.resolve('Hooray!!! She said "Yes"!');
+      return p1;
+    }
+    case false: {
+      const p2 = await Promise.resolve('Oh no, she said "No".');
+      return p2;
+    }
+    default:
+      throw new Error('Wrong parameter is passed! Ask her again.');
+  }
 }
-
 
 /**
  * Return Promise object that should be resolved with array containing plain values.
@@ -48,8 +57,8 @@ function willYouMarryMe(/* isPositiveAnswer */) {
  *    })
  *
  */
-function processAllPromises(/* array */) {
-  throw new Error('Not implemented');
+function processAllPromises(array) {
+  return Promise.all(array);
 }
 
 /**
@@ -71,8 +80,8 @@ function processAllPromises(/* array */) {
  *    })
  *
  */
-function getFastestPromise(/* array */) {
-  throw new Error('Not implemented');
+function getFastestPromise(array) {
+  return Promise.race(array);
 }
 
 /**
@@ -92,8 +101,21 @@ function getFastestPromise(/* array */) {
  *    });
  *
  */
-function chainPromises(/* array, action */) {
-  throw new Error('Not implemented');
+function chainPromises(array, action) {
+  return new Promise((resolve) => {
+    const newArray = [];
+    array.forEach((element) => {
+      element
+        .then((info) => {
+          newArray.push(info);
+        })
+        .catch(() => {
+          // console.log(e)
+        });
+    });
+
+    resolve(newArray);
+  }).then((arr) => arr.reduce((acc, curr) => action(acc, curr)));
 }
 
 module.exports = {

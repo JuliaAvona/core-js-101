@@ -110,32 +110,75 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  elemMarkup: '',
+  order: 0,
+  errors: {
+    selectorErr:
+      'Element, id and pseudo-element should not occur more then one time inside the selector',
+    orderErr:
+      'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element',
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    this.orderChecker(1);
+    this.elemMarkup += `#${value}`;
+    return this.createSelector('id');
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    this.orderChecker(0);
+    this.elemMarkup += value;
+    return this.createSelector('element');
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    this.orderChecker(2);
+    this.elemMarkup += `.${value}`;
+    return this.createSelector();
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    this.orderChecker(3);
+    this.elemMarkup += `[${value}]`;
+    return this.createSelector();
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    this.orderChecker(4);
+    this.elemMarkup += `:${value}`;
+    return this.createSelector();
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    this.orderChecker(5);
+    this.elemMarkup += `::${value}`;
+    return this.createSelector('pseudoElement');
+  },
+
+  combine(selector1, combinator, selector2) {
+    this.elemMarkup = `${selector1.stringify()} ${combinator} ${selector2.stringify()}`;
+    return this.createSelector();
+  },
+
+  stringify() {
+    return this.elemMarkup;
+  },
+
+  orderChecker(n) {
+    if (n < this.order) {
+      throw new Error(this.errors.orderErr);
+    }
+    this.order = n;
+  },
+
+  createSelector(elem) {
+    const selector = { ...this };
+    selector[elem] = () => {
+      throw new Error(this.errors.selectorErr);
+    };
+    this.elemMarkup = '';
+    this.order = 0;
+    return selector;
   },
 };
 
